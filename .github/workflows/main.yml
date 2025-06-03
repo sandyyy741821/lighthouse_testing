@@ -84,6 +84,12 @@ jobs:
             }
           }
           EOF
+        
+      - name: Serve React App
+        run: |
+          cd ${{ env.PROJECT_DIR }}/build
+          npx serve -s . -l 3000 &
+          sleep 5  # Wait for server to start
 
       - name: Run LHCI Collect
         run: |
