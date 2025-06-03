@@ -93,8 +93,8 @@ jobs:
       - name: Run Lighthouse Audit
         run: |
           cd ${{ env.PROJECT_DIR }}
-          serve build -l 4321 &  # Start static server in background
-          wait-on http://localhost:4321
+          serve build -l 3000 &  # Start static server in background
+          wait-on http://localhost:3000
           lhci autorun --config=.lighthouserc.${{ matrix.formfactor.name }}.json
         env:
           PORT: 3000
