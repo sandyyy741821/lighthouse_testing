@@ -85,17 +85,25 @@ jobs:
           }
           EOF
         
-      - name: Serve React App
+      - name: Install Static Server and Wait-On
         run: |
-          cd ${{ env.PROJECT_DIR }}/build
-          npx serve -s . -l 3000 &
-          sleep 5  # Wait for server to start
+          cd ${{ env.PROJECT_DIR }}
+          npm install -g serve wait-on
+
+      - name: Run Lighthouse Audit
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          serve build -l 4321 &  # Start static server in background
+          wait-on http://localhost:4321
+          lhci autorun --config=.lighthouserc.${{ matrix.formfactor.name }}.json
+        env:
+          PORT: 3000
 
       - name: Run LHCI Collect
         run: |
           cd ${{ env.PROJECT_DIR }}
           lhci collect --config .lighthouserc.${{ matrix.formfactor.name }}.json
-          
+
       - name: Upload LHCI Report as Artifact
         uses: actions/upload-artifact@v4
         with:
