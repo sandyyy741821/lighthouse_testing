@@ -59,7 +59,7 @@ jobs:
           cd ${{ env.PROJECT_DIR }}
           mkdir -p .lighthouseci
           find build -name '*.html' \
-            | sed -e 's|build||' -e 's|/*.jsx||' \
+            | sed -e 's|build||' -e 's|/*.tsx||' \
             | awk '{print "http://localhost:4321"$0}' > .lighthouseci/urls.txt
           echo "URLs generated in .lighthouseci/urls.txt:"
           cat .lighthouseci/urls.txt
