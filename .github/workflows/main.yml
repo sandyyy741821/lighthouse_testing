@@ -90,10 +90,14 @@ jobs:
           cd ${{ env.PROJECT_DIR }}
           npm install -g serve wait-on
 
-      - name: Run LHCI Collect
+      - name: Run Lighthouse Audit
         run: |
           cd ${{ env.PROJECT_DIR }}
-          lhci collect --config .lighthouserc.${{ matrix.formfactor.name }}.json
+          serve build -l 3000 &  # Start static server in background
+          wait-on http://localhost:3000
+          lhci collect --config=.lighthouserc.${{ matrix.formfactor.name }}.json
+        env:
+          PORT: 3000
 
       - name: Upload LHCI Report as Artifact
         uses: actions/upload-artifact@v4
