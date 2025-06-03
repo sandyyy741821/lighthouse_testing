@@ -61,7 +61,9 @@ jobs:
             "ci": {
               "collect": {
                 "numberOfRuns": 1,
-                "url": [],
+                "url": [
+                  "http://localhost:3000"
+                ],
                 "settings": {
                   "preset": "${{ matrix.formfactor.preset }}",
                   "emulatedFormFactor": "${{ matrix.formfactor.name }}",
@@ -93,6 +95,7 @@ jobs:
         run: |
           cd ${{ env.PROJECT_DIR }}
           lhci collect --config .lighthouserc.${{ matrix.formfactor.name }}.json
+          
       - name: Upload LHCI Report as Artifact
         uses: actions/upload-artifact@v4
         with:
