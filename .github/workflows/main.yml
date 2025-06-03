@@ -63,18 +63,6 @@ jobs:
                 "numberOfRuns": 1,
                 "url": [
                 "http://localhost:3000/"
-                # "http://localhost:3000/search/",
-                # "http://localhost:3000/search/:slug",
-                # "http://localhost:3000/search/:slug/admission/",
-                # "http://localhost:3000/search/:slug/course",
-                # "http://localhost:3000/search/:slug/course/:courseSlug",
-                # "http://localhost:3000/mobile-verification/",
-                # "http://localhost:3000/recommend-college-dream/",
-                # "http://localhost:3000/recommend-college-target/",
-                # "http://localhost:3000/recommend-college-safe/",
-                # "http://localhost:3000/mylist-college/",
-                # "http://localhost:3000/mylist-course/",
-                # "http://localhost:3000/my-profile/"
                 ],
                 "settings": {
                   "preset": "${{ matrix.formfactor.preset }}",
