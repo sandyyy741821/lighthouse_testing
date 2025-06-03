@@ -61,9 +61,7 @@ jobs:
             "ci": {
               "collect": {
                 "numberOfRuns": 1,
-                "url": [
-                  "http://localhost:3000/"
-                ],
+                "url": [],
                 "settings": {
                   "preset": "${{ matrix.formfactor.preset }}",
                   "emulatedFormFactor": "${{ matrix.formfactor.name }}",
