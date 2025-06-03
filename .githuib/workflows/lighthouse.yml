@@ -1,0 +1,130 @@
+name: CICD_PR
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+  pull_request_target:
+
+jobs:
+    lighthouse:
+        runs-on: ubuntu-latest
+        strategy:
+        matrix:
+            formfactor:
+            - name: mobile
+                width: 414
+                height: 736
+                preset: "desktop"
+            - name: desktop
+                width: 1920
+                height: 1080
+                preset: "desktop"
+            - name: tablet
+                width: 768
+                height: 1024
+                preset: "desktop"
+            - name: laptop
+                width: 1366
+                height: 768
+                preset: "desktop"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Find project directory with package.json
+        id: find_dir
+        run: |
+          PROJECT_DIR=$(find . -name package.json -exec dirname {} \; | head -n 1)
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+          echo "Found project directory: $PROJECT_DIR"
+      - name: Install Lighthouse CI and Dependencies
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          npm install -g @lhci/cli
+          npm install
+      - name: Build React App
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          export NODE_OPTIONS=--openssl-legacy-provider
+          SKIP_PREFLIGHT_CHECK=true npm run build
+      - name: Generate LHCI URLs
+        if: always()
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          mkdir -p .lighthouseci
+          find build -name '*.html' \
+            | sed -e 's|build||' -e 's|/index.html||' \
+            | awk '{print "http://localhost:4321"$0}' > .lighthouseci/urls.txt
+          echo "URLs generated in .lighthouseci/urls.txt:"
+          cat .lighthouseci/urls.txt
+      - name: Check URLs not empty
+        if: always()
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          if [ ! -s .lighthouseci/urls.txt ]; then
+            echo "ERROR: urls.txt is empty! No URLs to audit."
+            exit 1
+          fi
+      - name: Create Lighthouse CI Config
+        if: always()
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          cat << EOF > .lighthouserc.${{ matrix.formfactor.name }}.json
+          {
+            "ci": {
+              "collect": {
+                "numberOfRuns": 1,
+                "url": [],
+                "settings": {
+                  "preset": "${{ matrix.formfactor.preset }}",
+                  "emulatedFormFactor": "${{ matrix.formfactor.name }}",
+                  "screenEmulation": {
+                    "mobile": false,
+                    "width": ${{ matrix.formfactor.width }},
+                    "height": ${{ matrix.formfactor.height }},
+                    "deviceScaleFactor": 1,
+                    "disabled": false
+                  },
+                  "throttling": {
+                    "rttMs": 40,
+                    "throughputKbps": 10240,
+                    "cpuSlowdownMultiplier": 1,
+                    "requestLatencyMs": 0,
+                    "downloadThroughputKbps": 0,
+                    "uploadThroughputKbps": 0
+                  }
+                }
+              },
+              "upload": {
+                "target": "filesystem",
+                "outputDir": "./lhci-report-${{ matrix.formfactor.name }}"
+              }
+            }
+          }
+          EOF
+      - name: Update LHCI Config with URLs
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          urls=$(jq -R -s -c 'split("\n")[:-1]' < .lighthouseci/urls.txt)
+          jq --argjson urls "$urls" '.ci.collect.url = $urls' .lighthouserc.${{ matrix.formfactor.name }}.json > tmp && mv tmp .lighthouserc.${{ matrix.formfactor.name }}.json
+      - name: Install Static Server and Wait-On
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          npm install -g serve wait-on
+      - name: Run Lighthouse Audit
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          serve build -l 4321 &  # Start static server in background
+          wait-on http://localhost:4321
+          lhci autorun --config=.lighthouserc.${{ matrix.formfactor.name }}.json
+        env:
+          PORT: 4321
+
+      - name: Upload Lighthouse Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: lhci-report-${{ matrix.formfactor.name }}
+          path: ${{ env.PROJECT_DIR }}/lhci-report-${{ matrix.formfactor.name }}
