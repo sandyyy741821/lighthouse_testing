@@ -90,10 +90,12 @@ jobs:
           cd ${{ env.PROJECT_DIR }}
           npm install -g serve wait-on
 
-      - name: Get API from the .env
+      - name: Extract API URL from .env and export
         run: |
-          API_URL  = $(grep REACT_APP_API_URL ${{ env.PROJECT_DIR}} .env | cut -d '=' -f2)
+          cd ${{ env.PROJECT_DIR }}
+          API_URL=$(grep REACT_APP_API_URL .env | cut -d '=' -f2)
           echo "API_URL=$API_URL" >> $GITHUB_ENV
+
 
       - name: Run Lighthouse Audit
         run: |
