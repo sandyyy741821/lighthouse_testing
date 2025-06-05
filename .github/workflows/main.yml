@@ -99,6 +99,7 @@ jobs:
           serve  -s build -l 3000 &  # Start static server in background
           wait-on http://localhost:3000
           sleep 2
+          export CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
           lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
         env:
           PORT: 3000
