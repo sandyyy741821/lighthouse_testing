@@ -53,15 +53,6 @@ jobs:
           export NODE_OPTIONS=--openssl-legacy-provider
           SKIP_PREFLIGHT_CHECK=true npm run build
 
-      - name: Create Puppeteer Script
-        run: |
-          cat << EOF > wait-for-data.js
-            module.exports = async (page) => {
-              // Wait for React root element before auditing
-              await page.locator('#root').waitFor();
-          };
-          EOF
-
       - name: Create Lighthouse CI Config
         run: |
           cd ${{ env.PROJECT_DIR }}
