@@ -90,6 +90,14 @@ jobs:
           cd ${{ env.PROJECT_DIR }}
           npm install -g serve wait-on
 
+      - name: Debug .env content
+        run: |
+          echo "Listing project files:"
+          ls -al ${{ env.PROJECT_DIR }}
+          echo "Showing .env content:"
+          cat ${{ env.PROJECT_DIR }}/.env || echo ".env file not found"
+
+
       - name: Extract API URL from .env and export
         run: |
           cd ${{ env.PROJECT_DIR }}
