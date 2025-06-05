@@ -100,6 +100,11 @@ jobs:
           cd ${{ env.PROJECT_DIR }}
           npm install -g serve wait-on
 
+      - name: Install Chromium browser
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser
+
 
       - name: Run Lighthouse Audit
         run: |
