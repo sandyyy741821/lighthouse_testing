@@ -1,19 +1,21 @@
-const puppeteer = require('puppeteer');
+const fs = require('fs');
 
 module.exports = async function (browser, context) {
   const [page] = await browser.pages();
 
   console.log("⏳ Waiting for React app to load...");
+  await page.waitForTimeout(10000); // wait 10s for JS to render
 
-  // Optional: take a screenshot to debug what's rendered
-  await new Promise(resolve => setTimeout(resolve, 15000)); // wait 15 seconds
-  await page.screenshot({ path: 'debug-page.png' });
-
-  // Log HTML to see what’s actually loaded
   const content = await page.content();
   console.log("📄 Page content length:", content.length);
 
-  // Now wait for root
+  const htmlPath = 'page-dump.html';
+  fs.writeFileSync(htmlPath, content);
+  console.log(`📄 Saved HTML dump to ${htmlPath}`);
+
+  await page.screenshot({ path: 'debug-page.png' });
+  console.log("📸 Saved screenshot.");
+
   await page.waitForSelector('#root', { timeout: 20000 });
-  console.log("✅ #root loaded successfully");
+  console.log("✅ #root loaded");
 };
