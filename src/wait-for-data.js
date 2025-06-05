@@ -1,4 +1,3 @@
-export default async function(page) {
-  // Wait for the root element to be present in the DOM
+module.exports = async function (page, context) {
   await page.waitForSelector('#root');
-}
+};
