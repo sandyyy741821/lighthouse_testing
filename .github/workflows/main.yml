@@ -100,7 +100,7 @@ jobs:
 
       - name: Trigger API URL in .env
         run: |
-          curl "${{ env.API_URL}}/college-list" >> result.json
+          curl "${{ env.API_URL}}/college-list?degree=bachelor&limit=10&sort=popularity&skip=0" >> result.json
           cat result.json
 
       - name: Run Lighthouse Audit
