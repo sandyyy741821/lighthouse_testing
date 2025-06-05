@@ -29,12 +29,16 @@ jobs:
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
           echo "Found project directory: $PROJECT_DIR"
 
-      - name: Install Chrome
+      - name: Install Google Chrome (non-snap)
         run: |
           sudo apt-get update
-          sudo apt-get install -y chromium-browser
+          sudo apt-get install -y wget gnupg curl
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
         env:
-          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
+          DEBIAN_FRONTEND: noninteractive
 
       - name: Install Lighthouse CI and Dependencies
         run: |
@@ -57,9 +61,7 @@ jobs:
             "ci": {
               "collect": {
                 "numberOfRuns": 1,
-                "url": [
-                  "http://localhost:3000"
-                ],
+                "url": ["http://localhost:3000"],
                 "puppeteerScript": "src/wait-for-data.js",
                 "settings": {
                   "preset": "${{ matrix.formfactor.preset }}",
@@ -92,11 +94,11 @@ jobs:
           cd ${{ env.PROJECT_DIR }}
           serve -s build -l 3000 &  # Start static server
           npx wait-on http://localhost:3000
-          sleep 15
+          sleep 10
           lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
         env:
           PORT: 3000
-          CHROME_PATH: /usr/bin/chromium-browser
+          CHROME_PATH: /usr/bin/google-chrome
 
       - name: Upload LHCI Report as Artifact
         uses: actions/upload-artifact@v4
