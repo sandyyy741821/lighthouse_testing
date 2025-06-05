@@ -99,7 +99,7 @@ jobs:
           serve  -s build -l 3000 &  # Start static server in background
           wait-on http://localhost:3000
           sleep 2
-          CHROME_PATH=/snap/bin/chromium lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
+          lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
         env:
           PORT: 3000
 
