@@ -76,7 +76,8 @@ jobs:
                     "deviceScaleFactor": 1,
                     "disabled": false
                   },
-                  "throttlingMethod": "simulate"
+                  "throttlingMethod": "simulate",
+                  "chromeFlags": "--no-sandbox"
                 }
               },
               "upload": {
