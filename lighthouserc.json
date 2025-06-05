@@ -2,11 +2,11 @@
   "ci": {
     "collect": {
       "url": ["http://localhost:3000"],
-      "puppeteerScript": "./src/wait-for-data.js",
-      "startServerCommand": "npm start",
-      "startServerReadyPattern": "ready|listening|compiled successfully"
+      "puppeteerScript": "./src/wait-for-data.js"
     },
-    "waitForTimeout":120000,
+    "assert": {
+      "preset": "lighthouse:recommended"
+    },
     "upload": {
       "target": "temporary-public-storage"
     }

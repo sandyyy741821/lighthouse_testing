@@ -1,11 +1,13 @@
+const { TimeoutError } = require("redis");
+
 module.exports = async function (browser, context) {
-  const pages = await browser.pages();
-  const page = pages[0];
+  const [page] = await browser.pages();
+  console.log("page:", page);
+  console.log("typeof page.waitForSelector:", typeof page.waitForSelector);
 
-  console.log('Page URL:', page.url());
+  // Use waitForSelector instead of waitForTimeout
+  // You can also use setTimeout (pure JS) if needed
+  await new Promise(resolve => setTimeout(resolve, 5000)); // 5-second delay
 
-  const content = await page.content();
-  console.log('Page HTML content snippet:', content.slice(0, 500));
-
-  await page.waitForSelector('#root');
+  await page.waitForSelector('#root', {Timeout: 60000}); // Wait for the root element to appear
 };
