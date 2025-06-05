@@ -64,6 +64,7 @@ jobs:
                 "url": [
                 "http://localhost:3000/"
                 ],
+                "puppeteerScript": "wait-for-data.js",
                 "settings": {
                   "preset": "${{ matrix.formfactor.preset }}",
                   "emulatedFormFactor": "${{ matrix.formfactor.name }}",
@@ -85,14 +86,14 @@ jobs:
           }
           EOF
         
-      # - name: Create Puppeteer Script
-      #   run: |
-      #     cat << EOF > wait-for-data.js
-      #     module.exports = async (page) => {
-      #       // Wait for React root element before auditing
-      #       await page.waitForSelector('#root');
-      #     };
-      #     EOF
+      - name: Create Puppeteer Script
+        run: |
+          cat << EOF > wait-for-data.js
+          module.exports = async (page) => {
+            // Wait for React root element before auditing
+            await page.waitForSelector('#root');
+          };
+          EOF
 
       - name: Install Static Server and Wait-On
         run: |
