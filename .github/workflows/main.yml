@@ -17,18 +17,18 @@ jobs:
             width: 414
             height: 736
             preset: "desktop"
-          - name: desktop
-            width: 1920
-            height: 1080
-            preset: "desktop"
-          - name: tablet
-            width: 768
-            height: 1024
-            preset: "desktop"
-          - name: laptop
-            width: 1366
-            height: 768
-            preset: "desktop"
+          # - name: desktop
+          #   width: 1920
+          #   height: 1080
+          #   preset: "desktop"
+          # - name: tablet
+          #   width: 768
+          #   height: 1024
+          #   preset: "desktop"
+          # - name: laptop
+          #   width: 1366
+          #   height: 768
+          #   preset: "desktop"
 
     steps:
       - name: Checkout code
@@ -90,6 +90,12 @@ jobs:
           cd ${{ env.PROJECT_DIR }}
           npm install -g serve wait-on
 
+      - name: Get API from the .env
+        run: |
+          cd ${{ env.PROJECT_DIR}}
+          API_URL  = $(grep REACT_APP_API_URL .env | cut -d '=' -f2)
+          echo "API_URL=$API_URL" >> $GITHUB_ENV
+
       - name: Run Lighthouse Audit
         run: |
           cd ${{ env.PROJECT_DIR }}
@@ -99,7 +105,6 @@ jobs:
           lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
         env:
           PORT: 3000
-
 
       - name: Upload LHCI Report as Artifact
         uses: actions/upload-artifact@v4
