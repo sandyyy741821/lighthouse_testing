@@ -92,8 +92,7 @@ jobs:
 
       - name: Get API from the .env
         run: |
-          cd ${{ env.PROJECT_DIR}}
-          API_URL  = $(grep REACT_APP_API_URL .env | cut -d '=' -f2)
+          API_URL  = $(grep REACT_APP_API_URL ${{ env.PROJECT_DIR}}/ .env | cut -d '=' -f2)
           echo "API_URL=$API_URL" >> $GITHUB_ENV
 
       - name: Run Lighthouse Audit
