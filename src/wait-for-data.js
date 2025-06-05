@@ -1,10 +1,11 @@
 module.exports = async function (browser, context) {
-  // Get the first page/tab from the browser
   const pages = await browser.pages();
   const page = pages[0];
 
-  console.log('page:', page);
-  console.log('typeof page.waitForSelector:', typeof page.waitForSelector);
+  console.log('Page URL:', page.url());
+
+  const content = await page.content();
+  console.log('Page HTML content snippet:', content.slice(0, 500));
 
   await page.waitForSelector('#root');
 };

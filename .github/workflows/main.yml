@@ -63,7 +63,7 @@ jobs:
               "collect": {
                 "numberOfRuns": 1,
                 "url": [
-                "http://localhost:3000/"
+                "http://localhost:3000"
                 ],
                 "puppeteerScript": "src/wait-for-data.js",
                 "puppeteerLaunchOptions": {
