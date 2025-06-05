@@ -17,12 +17,20 @@ class BooksApp extends React.Component {
         books,
         isReady: true
       });
-    }, 5000); // 5000 ms = 5 seconds
+    }, 5000); 
   });
 }
 
 
   render() {
+    if (!this.state.isReady) {
+    // Show blank or loading page
+    return (
+      <div className="app">
+        <h2>Loading books, please wait...</h2>
+      </div>
+    );
+  }
     return (
       <div className="app">
         {this.state.showSearchPage ? (
