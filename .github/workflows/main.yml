@@ -66,6 +66,9 @@ jobs:
                 "http://localhost:3000/"
                 ],
                 "puppeteerScript": "src/wait-for-data.js",
+                "puppeteerLaunchOptions": {
+                "args": ["--no-sandbox"]
+                },
                 "settings": {
                   "preset": "${{ matrix.formfactor.preset }}",
                   "emulatedFormFactor": "${{ matrix.formfactor.name }}",
@@ -76,8 +79,7 @@ jobs:
                     "deviceScaleFactor": 1,
                     "disabled": false
                   },
-                  "throttlingMethod": "simulate",
-                  "chromeFlags": "--no-sandbox"
+                  "throttlingMethod": "simulate"
                 }
               },
               "upload": {
