@@ -101,7 +101,7 @@ jobs:
       - name: Extract API URL from .env and export
         run: |
           cd ${{ env.PROJECT_DIR }}
-          API_URL=$(grep REACT_APP_API_URL .env | cut -d '=' -f2 | xargs)
+          API_URL=$(grep REACT_APP_API_BASE_URL .env | cut -d '=' -f2 | xargs)
           echo "API_URL=$API_URL" >> $GITHUB_ENV
           echo "Exported API_URL: $API_URL"
 
