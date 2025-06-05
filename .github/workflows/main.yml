@@ -6,7 +6,7 @@ on:
       - '**'
   workflow_dispatch:
   pull_request_target:
-  
+
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
@@ -17,18 +17,6 @@ jobs:
             width: 414
             height: 736
             preset: "desktop"
-          # - name: desktop
-          #   width: 1920
-          #   height: 1080
-          #   preset: "desktop"
-          # - name: tablet
-          #   width: 768
-          #   height: 1024
-          #   preset: "desktop"
-          # - name: laptop
-          #   width: 1366
-          #   height: 768
-          #   preset: "desktop"
 
     steps:
       - name: Checkout code
@@ -40,6 +28,13 @@ jobs:
           PROJECT_DIR=$(find . -name package.json -exec dirname {} \; | head -n 1)
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
           echo "Found project directory: $PROJECT_DIR"
+
+      - name: Install Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser
+        env:
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: 'true'
 
       - name: Install Lighthouse CI and Dependencies
         run: |
@@ -63,7 +58,7 @@ jobs:
               "collect": {
                 "numberOfRuns": 1,
                 "url": [
-                "http://localhost:3000"
+                  "http://localhost:3000"
                 ],
                 "puppeteerScript": "src/wait-for-data.js",
                 "settings": {
@@ -86,7 +81,6 @@ jobs:
             }
           }
           EOF
-      
 
       - name: Install Static Server and Wait-On
         run: |
@@ -96,12 +90,13 @@ jobs:
       - name: Run Lighthouse Audit
         run: |
           cd ${{ env.PROJECT_DIR }}
-          serve  -s build -l 3000 &  # Start static server in background
+          serve -s build -l 3000 &  # Start static server
           npx wait-on http://localhost:3000
           sleep 15
           lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
         env:
           PORT: 3000
+          CHROME_PATH: /usr/bin/chromium-browser
 
       - name: Upload LHCI Report as Artifact
         uses: actions/upload-artifact@v4

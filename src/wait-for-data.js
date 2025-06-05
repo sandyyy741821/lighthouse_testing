@@ -1,13 +1,12 @@
-const { TimeoutError } = require("redis");
+const puppeteer = require('puppeteer');
 
 module.exports = async function (browser, context) {
   const [page] = await browser.pages();
-  console.log("page:", page);
-  console.log("typeof page.waitForSelector:", typeof page.waitForSelector);
+  console.log("Waiting for #root to load...");
 
-  // Use waitForSelector instead of waitForTimeout
-  // You can also use setTimeout (pure JS) if needed
-  await new Promise(resolve => setTimeout(resolve, 5000)); // 5-second delay
+  // Wait for 5 seconds
+  await new Promise(resolve => setTimeout(resolve, 5000));
 
-  await page.waitForSelector('#root', {Timeout: 60000}); // Wait for the root element to appear
+  // Wait for the #root element
+  await page.waitForSelector('#root', { timeout: 60000 });
 };
