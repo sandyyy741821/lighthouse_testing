@@ -65,10 +65,6 @@ jobs:
                 "url": [
                 "http://localhost:3000"
                 ],
-                "puppeteerScript": "src/wait-for-data.js",
-                "puppeteerLaunchOptions": {
-                "args": ["--no-sandbox"]
-                },
                 "settings": {
                   "preset": "${{ matrix.formfactor.preset }}",
                   "emulatedFormFactor": "${{ matrix.formfactor.name }}",
@@ -101,8 +97,7 @@ jobs:
           cd ${{ env.PROJECT_DIR }}
           serve  -s build -l 3000 &  # Start static server in background
           wait-on http://localhost:3000
-          sleep 2
-          export CHROME_PATH=$(node -e "console.log(require('puppeteer').executablePath())")
+          sleep 10
           lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
         env:
           PORT: 3000

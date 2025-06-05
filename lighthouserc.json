@@ -1,30 +1,14 @@
 {
-            "ci": {
-              "collect": {
-                "numberOfRuns": 1,
-                "url": [
-                "http://localhost:3000/"
-                ],
-                "puppeteerScript": "src/wait-for-data.js",
-                "puppeteerLaunchOptions": {
-                "args": ["--no-sandbox"]
-                },
-                "settings": {
-                  "preset": "desktop",
-                  "emulatedFormFactor": "Mobile",
-                  "screenEmulation": {
-                    "mobile": false,
-                    "width": 500,
-                    "height": 500,
-                    "deviceScaleFactor": 1,
-                    "disabled": false
-                  },
-                  "throttlingMethod": "simulate"
-                }
-              },
-              "upload": {
-                "target": "filesystem",
-                "outputDir": "./lhci-report-mobile"
-              }
-            }
-          }
+  "ci": {
+    "collect": {
+      "url": ["http://localhost:3000"],
+      "puppeteerScript": "./src/wait-for-data.js",
+      "startServerCommand": "npm start",
+      "startServerReadyPattern": "ready|listening|compiled successfully"
+    },
+    "waitForTimeout":120000,
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  }
+}
