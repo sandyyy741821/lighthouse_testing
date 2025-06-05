@@ -85,30 +85,27 @@ jobs:
           }
           EOF
         
+      # - name: Create Puppeteer Script
+      #   run: |
+      #     cat << EOF > wait-for-data.js
+      #     module.exports = async (page) => {
+      #       // Wait for React root element before auditing
+      #       await page.waitForSelector('#root');
+      #     };
+      #     EOF
+
       - name: Install Static Server and Wait-On
         run: |
           cd ${{ env.PROJECT_DIR }}
           npm install -g serve wait-on
 
 
-      - name: Extract API URL from .env and export
-        run: |
-          cd ${{ env.PROJECT_DIR }}
-          API_URL=$(grep REACT_APP_API_BASE_URL .env | cut -d '=' -f2 | xargs)
-          echo "API_URL=$API_URL" >> $GITHUB_ENV
-          echo "Exported API_URL: $API_URL"
-
-      - name: Trigger API URL in .env
-        run: |
-          curl "${{ env.API_URL}}/college-list?degree=bachelor&limit=10&sort=popularity&skip=0" >> result.json
-          cat result.json
-
       - name: Run Lighthouse Audit
         run: |
           cd ${{ env.PROJECT_DIR }}
           serve  -s build -l 3000 &  # Start static server in background
           wait-on http://localhost:3000
-          sleep 3
+          sleep 10
           lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
         env:
           PORT: 3000
