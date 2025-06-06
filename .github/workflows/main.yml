@@ -94,11 +94,23 @@ jobs:
           cd ${{ env.PROJECT_DIR }}
           serve -s build -l 3000 &  # Start static server
           npx wait-on http://localhost:3000
-          sleep 10
+          sleep 15
           lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
         env:
           PORT: 3000
           CHROME_PATH: /usr/bin/google-chrome
+
+      - name: Upload Debug Screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-screenshot
+          path: ${{ env.PROJECT_DIR }}/debug-page.png
+
+      - name: Upload Page HTML Dump
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-html
+          path: ${{ env.PROJECT_DIR }}/page-dump.html
 
 
       - name: Upload LHCI Report as Artifact
