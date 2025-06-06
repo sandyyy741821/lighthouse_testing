@@ -29,5 +29,8 @@ module.exports = async function (browser, context) {
   console.log("📸 Saved screenshot.");
 
   await page.waitForSelector('.app', { timeout: 60000 });
-  console.log("✅ #root loaded");
+  console.log("✅ .app loaded");
+
+  await page.waitForSelector('.list-books', { timeout: 60000 });
+  console.log("✅ .list-books loaded");
 };
