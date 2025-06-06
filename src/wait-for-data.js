@@ -29,7 +29,7 @@ module.exports = async function (browser, context) {
   console.log("Saved screenshot.");
 
 
-  await page.waitForSelector('#list-books-container', { timeout: 20000 });
+  await page.waitForSelector('#list-books-container');
   console.log("list-books loaded");
 };
 
