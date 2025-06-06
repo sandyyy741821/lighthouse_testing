@@ -29,23 +29,23 @@ jobs:
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
           echo "Found project directory: $PROJECT_DIR"
 
-      # - name: Install Google Chrome (non-snap)
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y wget gnupg curl
-      #     wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-      #     echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-      #     sudo apt-get update
-      #     sudo apt-get install -y google-chrome-stable
-        # env:
-        #   DEBIAN_FRONTEND: noninteractive
+      - name: Install Google Chrome (non-snap)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget gnupg curl
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+        env:
+          DEBIAN_FRONTEND: noninteractive
 
       - name: Install Lighthouse CI and Dependencies
         run: |
           cd ${{ env.PROJECT_DIR }}
           npm install -g @lhci/cli
           npm install
-        # npm install puppeteer
+          npm install puppeteer
 
       - name: Build React App
         run: |
@@ -62,6 +62,7 @@ jobs:
               "collect": {
                 "numberOfRuns": 3,
                 "url": ["http://localhost:3000"],
+                "puppeteerScript": "src/wait-for-data.js",
                 "settings": {
                   "preset": "${{ matrix.formfactor.preset }}",
                   "emulatedFormFactor": "${{ matrix.formfactor.name }}",
@@ -97,19 +98,19 @@ jobs:
           lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
         env:
           PORT: 3000
-          # CHROME_PATH: /usr/bin/google-chrome
+          CHROME_PATH: /usr/bin/google-chrome
 
-      # - name: Upload Debug Screenshot
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: debug-screenshot
-      #     path: ${{ env.PROJECT_DIR }}/debug-page.png
+      - name: Upload Debug Screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-screenshot
+          path: ${{ env.PROJECT_DIR }}/debug-page.png
 
-      # - name: Upload Page HTML Dump
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: debug-html
-      #     path: ${{ env.PROJECT_DIR }}/page-dump.html
+      - name: Upload Page HTML Dump
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-html
+          path: ${{ env.PROJECT_DIR }}/page-dump.html
 
 
       - name: Upload LHCI Report as Artifact
