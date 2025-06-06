@@ -18,7 +18,7 @@ class BooksApp extends React.Component {
         books,
         isReady: true
       });
-    }, 2000); 
+    }, 5000); 
   });
 }
 
