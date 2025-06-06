@@ -27,13 +27,13 @@ class BooksApp extends React.Component {
     if (!this.state.isReady) {
     // Show blank or loading page
     return (
-      <div className="apps" data-loading="true">
+      <div className="apps">
         <h2>Loading books, please wait...</h2>
       </div>
     );
   }
     return (
-      <div className="app" id="app-container" data-loaded="true">
+      <div className="app" id="app-container">
         {this.state.showSearchPage ? (
           <div className="search-books">
             <div className="search-books-bar">

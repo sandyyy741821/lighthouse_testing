@@ -10,17 +10,17 @@ module.exports = async function (browser, context) {
   console.log("📄 Initial page content length:", content.length);
 
   // Wait and retry if content length too small
-  let retries = 5;
-  while (content.length < 3000 && retries > 0) {
-    console.log(`Content length (${content.length}) < 200, waiting 3 seconds and retrying...`);
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    content = await page.content();
-    retries--;
-  }
+  // let retries = 5;
+  // while (content.length < 3000 && retries > 0) {
+  //   console.log(`Content length (${content.length}) < 200, waiting 3 seconds and retrying...`);
+  //   await new Promise(resolve => setTimeout(resolve, 3000));
+  //   content = await page.content();
+  //   retries--;
+  // }
 
-  if (content.length < 200) {
-    throw new Error('Page content length is still too small. React app might not have loaded properly.');
-  }
+  // if (content.length < 200) {
+  //   throw new Error('Page content length is still too small. React app might not have loaded properly.');
+  // }
 
   fs.writeFileSync('page-dump.html', content);
   console.log("📄 Saved HTML dump to page-dump.html");
@@ -28,9 +28,11 @@ module.exports = async function (browser, context) {
   await page.screenshot({ path: 'debug-page.png' });
   console.log("📸 Saved screenshot.");
 
-  await page.waitForSelector('[data-loaded="true"]', { timeout: 60000 });
-  console.log("✅ .app loaded");
 
   await page.waitForSelector('#list-books-container', { timeout: 60000 });
   console.log("✅ .list-books loaded");
 };
+
+
+
+
