@@ -28,6 +28,6 @@ module.exports = async function (browser, context) {
   await page.screenshot({ path: 'debug-page.png' });
   console.log("📸 Saved screenshot.");
 
-  await page.waitForSelector('.app', { timeout: 60000 });
+  await page.waitForSelector('.search-books-input-wrapper', { timeout: 60000 });
   console.log("✅ #root loaded");
 };
