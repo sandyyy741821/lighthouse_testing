@@ -97,19 +97,19 @@ jobs:
           lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
         env:
           PORT: 3000
-          CHROME_PATH: /usr/bin/google-chrome
+          # CHROME_PATH: /usr/bin/google-chrome
 
-      - name: Upload Debug Screenshot
-        uses: actions/upload-artifact@v4
-        with:
-          name: debug-screenshot
-          path: ${{ env.PROJECT_DIR }}/debug-page.png
+      # - name: Upload Debug Screenshot
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: debug-screenshot
+      #     path: ${{ env.PROJECT_DIR }}/debug-page.png
 
-      - name: Upload Page HTML Dump
-        uses: actions/upload-artifact@v4
-        with:
-          name: debug-html
-          path: ${{ env.PROJECT_DIR }}/page-dump.html
+      # - name: Upload Page HTML Dump
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: debug-html
+      #     path: ${{ env.PROJECT_DIR }}/page-dump.html
 
 
       - name: Upload LHCI Report as Artifact
