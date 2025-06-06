@@ -62,7 +62,6 @@ jobs:
               "collect": {
                 "numberOfRuns": 3,
                 "url": ["http://localhost:3000"],
-                "puppeteerScript": "src/wait-for-data.js",
                 "settings": {
                   "preset": "${{ matrix.formfactor.preset }}",
                   "emulatedFormFactor": "${{ matrix.formfactor.name }}",
