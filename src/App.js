@@ -27,7 +27,7 @@ class BooksApp extends React.Component {
     if (!this.state.isReady) {
     // Show blank or loading page
     return (
-      <div className="app">
+      <div className="apps">
         <h2>Loading books, please wait...</h2>
       </div>
     );
