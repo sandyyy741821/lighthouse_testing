@@ -60,7 +60,7 @@ jobs:
           {
             "ci": {
               "collect": {
-                "numberOfRuns": 1,
+                "numberOfRuns": 3,
                 "url": ["http://localhost:3000"],
                 "puppeteerScript": "src/wait-for-data.js",
                 "settings": {
