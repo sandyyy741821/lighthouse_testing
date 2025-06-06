@@ -21,7 +21,6 @@ module.exports = async function (browser, context) {
   await page.screenshot({ path: 'debug-page.png' });
   console.log("📸 Saved screenshot.");
 
-  // Wait for React root
-  await page.waitForSelector('#root', { timeout: 20000 });
+  await page.waitForSelector('#root', { timeout: 60000 });
   console.log("✅ #root loaded");
 };

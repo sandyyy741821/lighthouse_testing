@@ -180,4 +180,5 @@ fabric.properties
 
 
 
-.lighthouserc.json
+lighthouserc.json
+.lighthouseci
