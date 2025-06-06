@@ -94,7 +94,7 @@ jobs:
           cd ${{ env.PROJECT_DIR }}
           serve -s build -l 3000 &  # Start static server
           npx wait-on http://localhost:3000
-          sleep 10
+          sleep 6
           lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
         env:
           PORT: 3000
