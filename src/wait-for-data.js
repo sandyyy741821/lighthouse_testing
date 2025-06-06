@@ -11,7 +11,7 @@ module.exports = async function (browser, context) {
 
   // Wait and retry if content length too small
   let retries = 5;
-  while (content.length < 200 && retries > 0) {
+  while (content.length < 3000 && retries > 0) {
     console.log(`Content length (${content.length}) < 200, waiting 3 seconds and retrying...`);
     await new Promise(resolve => setTimeout(resolve, 3000));
     content = await page.content();
