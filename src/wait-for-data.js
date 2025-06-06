@@ -28,7 +28,7 @@ module.exports = async function (browser, context) {
   await page.screenshot({ path: 'debug-page.png' });
   console.log("📸 Saved screenshot.");
 
-  await page.waitForSelector('#app-container', { timeout: 60000 });
+  await page.waitForSelector('[data-loaded="true"]', { timeout: 60000 });
   console.log("✅ .app loaded");
 
   await page.waitForSelector('#list-books-container', { timeout: 60000 });
