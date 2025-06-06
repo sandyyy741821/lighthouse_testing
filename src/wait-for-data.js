@@ -3,17 +3,24 @@ const fs = require('fs');
 module.exports = async function (browser, context) {
   const [page] = await browser.pages();
 
-  console.log("⏳ Waiting for React app to load...");
-
-  // Wait 10 seconds
-  await new Promise(resolve => setTimeout(resolve, 10000));
-
-  // Optional: go to the page explicitly
+  console.log("⏳ Navigating to React app...");
   await page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });
 
-  // Dump HTML and take screenshot
-  const content = await page.content();
-  console.log("📄 Page content length:", content.length);
+  let content = await page.content();
+  console.log("📄 Initial page content length:", content.length);
+
+  // Wait and retry if content length too small
+  let retries = 5;
+  while (content.length < 200 && retries > 0) {
+    console.log(`Content length (${content.length}) < 200, waiting 3 seconds and retrying...`);
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    content = await page.content();
+    retries--;
+  }
+
+  if (content.length < 200) {
+    throw new Error('Page content length is still too small. React app might not have loaded properly.');
+  }
 
   fs.writeFileSync('page-dump.html', content);
   console.log("📄 Saved HTML dump to page-dump.html");
