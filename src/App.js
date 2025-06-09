@@ -7,18 +7,18 @@ class BooksApp extends React.Component {
   state = {
     showSearchPage: false,
     isReady: false,
-    books: [] // ⬅️ Add books state
+    books: [] 
   }
 
   componentDidMount() {
   BooksAPI.getAll().then(books => {
-    // Wait for 5 seconds after fetching books
     setTimeout(() => {
       this.setState({
         books,
         isReady: true
       });
-    }, 2000); 
+      window.appIsReady = true;
+    }, 3000); 
   });
 }
 

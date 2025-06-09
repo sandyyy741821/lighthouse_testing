@@ -62,7 +62,7 @@ jobs:
               "collect": {
                 "numberOfRuns": 3,
                 "url": ["http://localhost:3000"],
-                "waitForSelector": "#list-books-container",
+                "waitForExpression": "window.appIsReady === true",
                 "settings": {
                   "preset": "${{ matrix.formfactor.preset }}",
                   "emulatedFormFactor": "${{ matrix.formfactor.name }}",
