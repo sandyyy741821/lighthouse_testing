@@ -146,57 +146,90 @@
 
 
 
-name: Lighthouse CI
+name: Lighthouse CI with appIsReady Check
 
 on:
   push:
-    branches: [main]
-  pull_request:
+    branches:
+      - '**'
+  pull_request_target:
+  workflow_dispatch:
 
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        formfactor:
+          - name: mobile
+            width: 414
+            height: 736
+            preset: "desktop"
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Install Lighthouse CI
-        run: npm install -g @lhci/cli
-
-      - name: Create LHCI config
+      - name: Find project directory with package.json
+        id: find_dir
         run: |
-          mkdir -p .lighthouseci
-          cat <<EOF > .lighthouseci/urls.txt
-          http://localhost:3000
-          EOF
+          PROJECT_DIR=$(find . -name package.json -exec dirname {} \; | head -n 1)
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+          echo "Found project directory: $PROJECT_DIR"
 
-          cat <<EOF > .lighthouserc.json
+      - name: Install Lighthouse CI and Dependencies
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          npm install -g @lhci/cli
+          npm install
+          npm install puppeteer
+
+      - name: Create .lighthouseci/urls.txt
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          mkdir -p .lighthouseci
+          echo "http://localhost:3000" > .lighthouseci/urls.txt
+
+      - name: Create Lighthouse CI Config with appIsReady check
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          URLS=$(cat .lighthouseci/urls.txt | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          cat << EOF > .lighthouserc.${{ matrix.formfactor.name }}.json
           {
             "ci": {
               "collect": {
                 "startServerCommand": "npm start",
-                "url": ["http://localhost:3000"],
+                "url": $URLS,
                 "waitForExpression": "window.appIsReady === true",
                 "numberOfRuns": 1,
                 "settings": {
-                  "preset": "desktop"
+                  "preset": "${{ matrix.formfactor.preset }}",
+                  "emulatedFormFactor": "${{ matrix.formfactor.name }}",
+                  "screenEmulation": {
+                    "mobile": false,
+                    "width": ${{ matrix.formfactor.width }},
+                    "height": ${{ matrix.formfactor.height }},
+                    "deviceScaleFactor": 1,
+                    "disabled": false
+                  },
+                  "throttlingMethod": "simulate"
                 }
               },
               "upload": {
-                "target": "temporary-public-storage"
+                "target": "filesystem",
+                "outputDir": "./lhci-report-${{ matrix.formfactor.name }}"
               }
             }
           }
           EOF
 
-      - name: Run Lighthouse CI
-        run: lhci autorun
+      - name: Run Lighthouse CI Audit
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
+
+      - name: Upload LHCI Report as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lhci-report-${{ matrix.formfactor.name }}
+          path: ${{ env.PROJECT_DIR }}/lhci-report-${{ matrix.formfactor.name }}
