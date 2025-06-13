@@ -68,13 +68,13 @@ jobs:
                 echo "https://dev.futurx.app/college/$slug" >> .lighthouseci/urls.txt
                 COUNT=$((COUNT+1))
               fi
-              if [ "$COUNT" -ge 2 ]; then
+              if [ "$COUNT" -ge 1 ]; then
                 break 2 # Break out of both loops once 2 URLs are added
               fi
             done
           done
 
-          echo "✅ Final list of URLs to audit:"
+          echo "Final list of URLs to audit:"
           cat .lighthouseci/urls.txt
 
 
@@ -100,6 +100,7 @@ jobs:
                     "deviceScaleFactor": 1,
                     "disabled": false
                   },
+                  "puppeteerScript": "./.lighthouseci/setup.js",
                   "throttlingMethod": "simulate"
                 }
               },
@@ -126,6 +127,7 @@ jobs:
           lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
         env:
           PORT: 3000
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           # CHROME_PATH: /usr/bin/google-chrome
 
       # - name: Upload Debug Screenshot
