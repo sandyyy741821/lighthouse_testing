@@ -29,16 +29,6 @@ jobs:
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
           echo "Found project directory: $PROJECT_DIR"
 
-      # - name: Install Google Chrome (non-snap)
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y wget gnupg curl
-      #     wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-      #     echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-      #     sudo apt-get update
-      #     sudo apt-get install -y google-chrome-stable
-      #   env:
-      #     DEBIAN_FRONTEND: noninteractive
 
       - name: Install Lighthouse CI and Dependencies
         run: |
@@ -52,18 +42,48 @@ jobs:
           cd ${{ env.PROJECT_DIR }}
           export NODE_OPTIONS=--openssl-legacy-provider
           SKIP_PREFLIGHT_CHECK=true npm run build
+      
+      - name: Generate LHCI URLs (Static + Dynamic)
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          mkdir -p .lighthouseci
+
+          echo "Adding hardcoded static routes..."
+          cat <<EOF > .lighthouseci/urls.txt
+          http://localhost:3000/
+          EOF
+
+          echo "Fetching dynamic college slugs from FuturX API..."
+
+          for degree in bachelor master doctoral associate; do
+            echo "Fetching for degree: $degree"
+            curl -s -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN }}" \
+                -H "Content-Type: application/json" \
+                "https://${{ secrets.FUTURX_BACKEND_API}}/college-list?degree=$degree" | \
+            jq -r '.data[]?.collegeSlug' | \
+            while read slug; do
+              if [ "$slug" != "null" ]; then
+                echo "http://${{ secrets.FUTURX_FRONTEND_API}}/college/$slug" >> .lighthouseci/urls.txt
+              fi
+            done
+          done
+
+          echo "✅ Final list of URLs to audit:"
+          cat .lighthouseci/urls.txt
+
+
 
       - name: Create Lighthouse CI Config
         run: |
           cd ${{ env.PROJECT_DIR }}
+          URLS=$(cat .lighthouseci/urls.txt | jq -R -s -c 'split("\n") | map(select(. != ""))')
           cat << EOF > .lighthouserc.${{ matrix.formfactor.name }}.json
           {
             "ci": {
               "collect": {
-                "numberOfRuns": 3,
-                "url": ["http://localhost:3000"],
+                "numberOfRuns": 1,
+                "url": $URLS,
                 "waitForTime": 5000,
-                "waitForExpression": "window.appIsReady === true",
                 "settings": {
                   "preset": "${{ matrix.formfactor.preset }}",
                   "emulatedFormFactor": "${{ matrix.formfactor.name }}",
@@ -84,6 +104,7 @@ jobs:
             }
           }
           EOF
+
 
       - name: Install Static Server and Wait-On
         run: |
