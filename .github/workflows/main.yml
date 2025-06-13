@@ -55,15 +55,21 @@ jobs:
 
           echo "Fetching dynamic college slugs from FuturX API..."
 
+          COUNT=0
           for degree in bachelor master doctoral associate; do
             echo "Fetching for degree: $degree"
             curl -s -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN }}" \
                 -H "Content-Type: application/json" \
-                "https://${{ secrets.FUTURX_BACKEND_API}}/college-list?degree=$degree" | \
+                "https://${{ secrets.FUTURX_BACKEND_API }}/college-list?degree=$degree" | \
             jq -r '.data[]?.collegeSlug' | \
             while read slug; do
-              if [ "$slug" != "null" ]; then
+              slug=$(echo "$slug" | xargs) # trim whitespace
+              if [ -n "$slug" ] && [ "$slug" != "null" ]; then
                 echo "https://dev.futurx.app/college/$slug" >> .lighthouseci/urls.txt
+                COUNT=$((COUNT+1))
+              fi
+              if [ "$COUNT" -ge 2 ]; then
+                break 2 # Break out of both loops once 2 URLs are added
               fi
             done
           done
