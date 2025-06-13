@@ -198,7 +198,7 @@ jobs:
           {
             "ci": {
               "collect": {
-                "startServerCommand": "PORT=3000 npm start",
+                "startServerCommand": "export NODE_OPTIONS=--openssl-legacy-provider && PORT=3000 npm start",
                 "url": $URLS,
                 "waitForExpression": "window.appIsReady === true",
                 "numberOfRuns": 1,
