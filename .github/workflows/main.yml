@@ -63,7 +63,7 @@ jobs:
             jq -r '.data[]?.collegeSlug' | \
             while read slug; do
               if [ "$slug" != "null" ]; then
-                echo "https://${{ secrets.FUTURX_FRONTEND_API}}/college/$slug" >> .lighthouseci/urls.txt
+                echo "https://dev.futurx.app/college/$slug" >> .lighthouseci/urls.txt
               fi
             done
           done
