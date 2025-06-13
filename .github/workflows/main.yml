@@ -161,9 +161,9 @@ jobs:
     strategy:
       matrix:
         formfactor:
-          - name: mobile
-            width: 414
-            height: 736
+          - name: laptop
+            width: 1080
+            height: 1920
             preset: "desktop"
 
     steps:
