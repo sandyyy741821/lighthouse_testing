@@ -190,12 +190,6 @@ jobs:
           mkdir -p .lighthouseci
           echo "http://localhost:3000" > .lighthouseci/urls.txt
 
-      - name: Build React App
-        run: |
-          cd ${{ env.PROJECT_DIR }}
-          export NODE_OPTIONS=--openssl-legacy-provider
-          SKIP_PREFLIGHT_CHECK=true npm run build
-
       - name: Create Lighthouse CI Config with appIsReady check
         run: |
           cd ${{ env.PROJECT_DIR }}
@@ -204,7 +198,7 @@ jobs:
           {
             "ci": {
               "collect": {
-                "startServerCommand": "export NODE_OPTIONS=--openssl-legacy-provider && npm start",
+                "startServerCommand": "PORT=3000 npm start",
                 "url": $URLS,
                 "waitForExpression": "window.appIsReady === true",
                 "numberOfRuns": 1,
