@@ -43,33 +43,33 @@
 #           export NODE_OPTIONS=--openssl-legacy-provider
 #           SKIP_PREFLIGHT_CHECK=true npm run build
       
-#       - name: Generate LHCI URLs (Static + Dynamic)
-#         run: |
-#           cd ${{ env.PROJECT_DIR }}
-#           mkdir -p .lighthouseci
+      # - name: Generate LHCI URLs (Static + Dynamic)
+      #   run: |
+      #     cd ${{ env.PROJECT_DIR }}
+      #     mkdir -p .lighthouseci
 
-#           echo "Adding hardcoded static routes..."
-#           cat <<EOF > .lighthouseci/urls.txt
-#           http://localhost:3000/
-#           EOF
+      #     echo "Adding hardcoded static routes..."
+      #     cat <<EOF > .lighthouseci/urls.txt
+      #     http://localhost:3000/
+      #     EOF
 
-#           echo "Fetching dynamic college slugs from FuturX API..."
+      #     echo "Fetching dynamic college slugs from FuturX API..."
 
-#           for degree in bachelor master doctoral associate; do
-#             echo "Fetching for degree: $degree"
-#             curl -s -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN }}" \
-#                 -H "Content-Type: application/json" \
-#                 "https://${{ secrets.FUTURX_BACKEND_API}}/college-list?degree=$degree" | \
-#             jq -r '.data[]?.collegeSlug' | \
-#             while read slug; do
-#               if [ "$slug" != "null" ]; then
-#                 echo "https://dev.futurx.app/college/$slug" >> .lighthouseci/urls.txt
-#               fi
-#             done
-#           done
+      #     for degree in bachelor master doctoral associate; do
+      #       echo "Fetching for degree: $degree"
+      #       curl -s -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN }}" \
+      #           -H "Content-Type: application/json" \
+      #           "https://${{ secrets.FUTURX_BACKEND_API}}/college-list?degree=$degree" | \
+      #       jq -r '.data[]?.collegeSlug' | \
+      #       while read slug; do
+      #         if [ "$slug" != "null" ]; then
+      #           echo "https://dev.futurx.app/college/$slug" >> .lighthouseci/urls.txt
+      #         fi
+      #       done
+      #     done
 
-#           echo "Final list of URLs to audit:"
-#           cat .lighthouseci/urls.txt
+      #     echo "Final list of URLs to audit:"
+      #     cat .lighthouseci/urls.txt
 
 
 
