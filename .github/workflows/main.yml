@@ -22,17 +22,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Gitleaks
-        run: |
-          # Download a specific Linux AMD64 release to avoid HTML redirect issues
-          curl -sSL -L -o gitleaks https://github.com/zricethezav/gitleaks/releases/download/v9.23.0/gitleaks_9.23.0_linux_x64
-          chmod +x gitleaks
-          sudo mv gitleaks /usr/local/bin/gitleaks
-          gitleaks version
-
       - name: Run Gitleaks
-        run: |
-          gitleaks detect --source . --report-format sarif --report-path gitleaks-report.sarif
+        uses: zricethezav/gitleaks-action@v9
+        with:
+          # `fetch-depth: 0` is required for Gitleaks to scan the full history
+          detect_secrets_on_head_commit: false
+          report_format: sarif
+          # Set `fail_on_leak` to false to allow the workflow to continue and upload the report
+          fail_on_leak: false
 
       - name: Upload Gitleaks Report as Artifact
         uses: actions/upload-artifact@v4
