@@ -24,11 +24,11 @@ jobs:
 
       - name: Install Gitleaks
         run: |
-          # Follow redirects and download the latest release
-          curl -sSL -L -o gitleaks.tar.gz https://github.com/zricethezav/gitleaks/releases/latest/download/gitleaks-linux-amd64.tar.gz
-          # Extract archive
-          tar -xzf gitleaks.tar.gz
-          # Move binary to system path
+          # Download the Linux AMD64 binary directly
+          curl -sSL -o gitleaks https://github.com/zricethezav/gitleaks/releases/latest/download/gitleaks-linux-amd64
+          # Make it executable
+          chmod +x gitleaks
+          # Move to system path
           sudo mv gitleaks /usr/local/bin/gitleaks
 
       - name: Run Gitleaks
