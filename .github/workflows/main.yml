@@ -27,18 +27,17 @@ jobs:
 
       - name: Scan modified .env files in PR
         run: |
-          # Get list of .env files changed in this PR
           files=$(git diff --name-only origin/main...HEAD | grep '\.env$' || true)
           if [ -z "$files" ]; then
             echo "No .env files changed in this PR."
             exit 0
           fi
           echo "Scanning modified .env files: $files"
-          # Run Gitleaks scan only on modified .env files
           gitleaks detect --source=. --files-path "$files" --report=gitleaks-report.json
-      - name: Upload report
-        if: failure()
-        uses: actions/upload-artifact@v3
+
+      - name: Upload Gitleaks Report
+        if: ${{ always() && steps.scan_modified_env_files.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
         with:
           name: gitleaks-report
           path: gitleaks-report.json
