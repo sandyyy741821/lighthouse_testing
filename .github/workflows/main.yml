@@ -66,33 +66,33 @@ jobs:
           cd ${{ env.PROJECT_DIR }}
           URLS=$(cat .lighthouseci/urls.txt | jq -R -s -c 'split("\n") | map(select(. != ""))')
           cat > .lighthouserc.${{ matrix.formfactor.name }}.json <<EOF
-{
-  "ci": {
-    "collect": {
-      "startServerCommand": "export NODE_OPTIONS=--openssl-legacy-provider && PORT=3000 npm start",
-      "url": $URLS,
-      "waitForExpression": "window.appIsReady === true",
-      "numberOfRuns": 1,
-      "settings": {
-        "preset": "${{ matrix.formfactor.preset }}",
-        "emulatedFormFactor": "${{ matrix.formfactor.name }}",
-        "screenEmulation": {
-          "mobile": false,
-          "width": ${{ matrix.formfactor.width }},
-          "height": ${{ matrix.formfactor.height }},
-          "deviceScaleFactor": 1,
-          "disabled": false
-        },
-        "throttlingMethod": "simulate"
-      }
-    },
-    "upload": {
-      "target": "filesystem",
-      "outputDir": "./lhci-report-${{ matrix.formfactor.name }}"
-    }
-  }
-}
-EOF
+          {
+            "ci": {
+              "collect": {
+                "startServerCommand": "export NODE_OPTIONS=--openssl-legacy-provider && PORT=3000 npm start",
+                "url": $URLS,
+                "waitForExpression": "window.appIsReady === true",
+                "numberOfRuns": 1,
+                "settings": {
+                  "preset": "${{ matrix.formfactor.preset }}",
+                  "emulatedFormFactor": "${{ matrix.formfactor.name }}",
+                  "screenEmulation": {
+                    "mobile": false,
+                    "width": ${{ matrix.formfactor.width }},
+                    "height": ${{ matrix.formfactor.height }},
+                    "deviceScaleFactor": 1,
+                    "disabled": false
+                  },
+                  "throttlingMethod": "simulate"
+                }
+              },
+              "upload": {
+                "target": "filesystem",
+                "outputDir": "./lhci-report-${{ matrix.formfactor.name }}"
+              }
+            }
+          }
+          EOF
 
       - name: Run Lighthouse CI Audit
         run: |
