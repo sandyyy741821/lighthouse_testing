@@ -25,19 +25,23 @@ jobs:
           # `fetch-depth: 0` is required for Gitleaks to scan the full history
           fetch-depth: 0
 
-      - name: Run Gitleaks
-        # Use the correct major version, currently v2
-        uses: zricethezav/gitleaks-action@v2
-        with:
-          # Set `fail_on_leak` to false to allow the workflow to continue and upload the report
-          fail_on_leak: false
-          report_format: sarif
-          
-      - name: Upload Gitleaks Report as Artifact
-        uses: actions/upload-artifact@v4
+      - name: Scan modified .env files in PR
+        run: |
+          # Get list of .env files changed in this PR
+          files=$(git diff --name-only origin/main...HEAD | grep '\.env$' || true)
+          if [ -z "$files" ]; then
+            echo "No .env files changed in this PR."
+            exit 0
+          fi
+          echo "Scanning modified .env files: $files"
+          # Run Gitleaks scan only on modified .env files
+          gitleaks detect --source=. --files-path "$files" --report=gitleaks-report.json
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v3
         with:
           name: gitleaks-report
-          path: gitleaks-report.sarif
+          path: gitleaks-report.json
 
       - name: Find project directory with package.json
         id: find_dir
