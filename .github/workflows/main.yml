@@ -1,3 +1,151 @@
+# name: CICD_PR
+
+# on:
+#   push:
+#     branches:
+#       - '**'
+#   workflow_dispatch:
+#   pull_request_target:
+
+# jobs:
+#   lighthouse:
+#     runs-on: ubuntu-latest
+#     strategy:
+#       matrix:
+#         formfactor:
+#           - name: mobile
+#             width: 414
+#             height: 736
+#             preset: "desktop"
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name: Find project directory with package.json
+#         id: find_dir
+#         run: |
+#           PROJECT_DIR=$(find . -name package.json -exec dirname {} \; | head -n 1)
+#           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+#           echo "Found project directory: $PROJECT_DIR"
+
+
+#       - name: Install Lighthouse CI and Dependencies
+#         run: |
+#           cd ${{ env.PROJECT_DIR }}
+#           npm install -g @lhci/cli
+#           npm install
+#           npm install puppeteer
+
+#       - name: Build React App
+#         run: |
+#           cd ${{ env.PROJECT_DIR }}
+#           export NODE_OPTIONS=--openssl-legacy-provider
+#           SKIP_PREFLIGHT_CHECK=true npm run build
+      
+      # - name: Generate LHCI URLs (Static + Dynamic)
+      #   run: |
+      #     cd ${{ env.PROJECT_DIR }}
+      #     mkdir -p .lighthouseci
+
+      #     echo "Adding hardcoded static routes..."
+      #     cat <<EOF > .lighthouseci/urls.txt
+      #     http://localhost:3000/
+      #     EOF
+
+      #     echo "Fetching dynamic college slugs from FuturX API..."
+
+      #     for degree in bachelor master doctoral associate; do
+      #       echo "Fetching for degree: $degree"
+      #       curl -s -H "Authorization: Bearer ${{ secrets.ACCESS_TOKEN }}" \
+      #           -H "Content-Type: application/json" \
+      #           "https://${{ secrets.FUTURX_BACKEND_API}}/college-list?degree=$degree" | \
+      #       jq -r '.data[]?.collegeSlug' | \
+      #       while read slug; do
+      #         if [ "$slug" != "null" ]; then
+      #           echo "https://dev.futurx.app/college/$slug" >> .lighthouseci/urls.txt
+      #         fi
+      #       done
+      #     done
+
+      #     echo "Final list of URLs to audit:"
+      #     cat .lighthouseci/urls.txt
+
+
+
+#       - name: Create Lighthouse CI Config
+#         run: |
+#           cd ${{ env.PROJECT_DIR }}
+#           URLS=$(cat .lighthouseci/urls.txt | jq -R -s -c 'split("\n") | map(select(. != ""))')
+#           cat << EOF > .lighthouserc.${{ matrix.formfactor.name }}.json
+#           {
+#             "ci": {
+#               "collect": {
+#                 "numberOfRuns": 1,
+#                 "url": $URLS,
+#                 "waitForTime": 5000,
+#                 "settings": {
+#                   "preset": "${{ matrix.formfactor.preset }}",
+#                   "emulatedFormFactor": "${{ matrix.formfactor.name }}",
+#                   "screenEmulation": {
+#                     "mobile": false,
+#                     "width": ${{ matrix.formfactor.width }},
+#                     "height": ${{ matrix.formfactor.height }},
+#                     "deviceScaleFactor": 1,
+#                     "disabled": false
+#                   },
+#                   "throttlingMethod": "simulate"
+#                 }
+#               },
+#               "upload": {
+#                 "target": "filesystem",
+#                 "outputDir": "./lhci-report-${{ matrix.formfactor.name }}"
+#               }
+#             }
+#           }
+#           EOF
+
+
+#       - name: Install Static Server and Wait-On
+#         run: |
+#           cd ${{ env.PROJECT_DIR }}
+#           npm install -g serve wait-on
+
+#       - name: Run Lighthouse Audit
+#         run: |
+#           cd ${{ env.PROJECT_DIR }}
+#           serve -s build -l 3000 &  # Start static server
+#           npx wait-on http://localhost:3000
+#           sleep 15
+#           lhci autorun --config .lighthouserc.${{ matrix.formfactor.name }}.json
+#         env:
+#           PORT: 3000
+#           # CHROME_PATH: /usr/bin/google-chrome
+
+#       # - name: Upload Debug Screenshot
+#       #   uses: actions/upload-artifact@v4
+#       #   with:
+#       #     name: debug-screenshot
+#       #     path: ${{ env.PROJECT_DIR }}/debug-page.png
+
+#       # - name: Upload Page HTML Dump
+#       #   uses: actions/upload-artifact@v4
+#       #   with:
+#       #     name: debug-html
+#       #     path: ${{ env.PROJECT_DIR }}/page-dump.html
+
+
+#       - name: Upload LHCI Report as Artifact
+#         uses: actions/upload-artifact@v4
+#         with:
+#           name: lhci-report-${{ matrix.formfactor.name }}
+#           path: ${{ env.PROJECT_DIR }}/lhci-report-${{ matrix.formfactor.name }}
+
+
+
+
+
+
 name: Lighthouse CI with appIsReady Check
 
 on:
@@ -21,32 +169,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          # `fetch-depth: 0` is required for Gitleaks to scan the full history
-          fetch-depth: 0
-
-      - name: Scan modified .env files in PR
-        run: |
-          files=$(git diff --name-only origin/main...HEAD | grep '\.env$' || true)
-          if [ -z "$files" ]; then
-            echo "No .env files changed in this PR."
-            exit 0
-          fi
-          echo "Scanning modified .env files: $files"
-          gitleaks detect --source=. --files-path "$files" --report=gitleaks-report.json
-
-      - name: Upload Gitleaks Report
-        if: ${{ always() && steps.scan_modified_env_files.outcome == 'failure' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: gitleaks-report
-          path: gitleaks-report.json
 
       - name: Find project directory with package.json
         id: find_dir
         run: |
           PROJECT_DIR=$(find . -name package.json -exec dirname {} \; | head -n 1)
-          echo "PROJECT_DIR=$PROJECT_ENV" >> $GITHUB_ENV
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
           echo "Found project directory: $PROJECT_DIR"
 
       - name: Install Lighthouse CI and Dependencies
@@ -66,7 +194,7 @@ jobs:
         run: |
           cd ${{ env.PROJECT_DIR }}
           URLS=$(cat .lighthouseci/urls.txt | jq -R -s -c 'split("\n") | map(select(. != ""))')
-          cat > .lighthouserc.${{ matrix.formfactor.name }}.json <<EOF
+          cat << EOF > .lighthouserc.${{ matrix.formfactor.name }}.json
           {
             "ci": {
               "collect": {
