@@ -21,16 +21,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Run Gitleaks
-        uses: zricethezav/gitleaks-action@v9
         with:
           # `fetch-depth: 0` is required for Gitleaks to scan the full history
-          detect_secrets_on_head_commit: false
-          report_format: sarif
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        # Use the correct major version, currently v2
+        uses: zricethezav/gitleaks-action@v2
+        with:
           # Set `fail_on_leak` to false to allow the workflow to continue and upload the report
           fail_on_leak: false
-
+          report_format: sarif
+          
       - name: Upload Gitleaks Report as Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -41,7 +43,7 @@ jobs:
         id: find_dir
         run: |
           PROJECT_DIR=$(find . -name package.json -exec dirname {} \; | head -n 1)
-          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+          echo "PROJECT_DIR=$PROJECT_ENV" >> $GITHUB_ENV
           echo "Found project directory: $PROJECT_DIR"
 
       - name: Install Lighthouse CI and Dependencies
