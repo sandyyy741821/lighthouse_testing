@@ -1,14 +1,26 @@
 {
   "ci": {
     "collect": {
+      "startServerCommand": "export NODE_OPTIONS=--openssl-legacy-provider && PORT=3000 npm start",
       "url": ["http://localhost:3000"],
-      "puppeteerScript": "./src/wait-for-data.js"
-    },
-    "assert": {
-      "preset": "lighthouse:recommended"
+      "waitForExpression": "window.appIsReady === true",
+      "numberOfRuns": 1,
+      "settings": {
+        "preset": "desktop",
+        "emulatedFormFactor": "desktop",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1080,
+          "height": 1920,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "throttlingMethod": "simulate"
+      }
     },
     "upload": {
-      "target": "temporary-public-storage"
+      "target": "filesystem",
+      "outputDir": "./lhci-report"
     }
   }
 }
